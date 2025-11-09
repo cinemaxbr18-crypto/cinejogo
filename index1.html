@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pescaria Aérea</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #c8e6c9; padding: 0; margin: 0; }
+        h3 { color: #388e3c; }
+        #game-container { 
+            width: 90%; 
+            max-width: 500px;
+            height: 400px; 
+            border: 5px solid #1a237e;
+            margin: 20px auto; 
+            position: relative; 
+            background: #42a5f5; /* Fundo do céu */
+            overflow: hidden;
+        }
+        .food-item {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            top: 0; 
+            border-radius: 50%;
+            line-height: 50px;
+            font-size: 30px;
+            text-align: center;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            user-select: none;
+            transition: left 0.5s;
+        }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin-top: 10px; background-color: #388e3c; color: white; border: none; border-radius: 5px;}
+        #message { color: #d32f2f; font-weight: bold; margin-top: 10px; }
+        .speed-up { color: #ff9800; animation: flash 0.5s infinite alternate; }
+        @keyframes flash {
+            from { opacity: 1; }
+            to { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <h3>Jogo 1: Pescaria Aérea</h3>
+    <p id="message">Clique em "Começar" e pegue os alimentos antes que caiam!</p>
+    <div id="game-container">
+        </div>
+    <p>
+        Pontuação: <span id="score">0</span> | 
+        Perdidos: <span id="missed">0</span> |
+        Velocidade: <span id="speed-level">1</span>
+    </p>
+    <button onclick="startGame1()">Começar</button>
+
+    <script>
+        const container = document.getElementById('game-container');
+        const scoreEl = document.getElementById('score');
+        const missedEl = document.getElementById('missed');
+        const messageEl = document.getElementById('message');
+        const speedLevelEl = document.getElementById('speed-level');
+        
+        const foodSymbols = ['🍎', '🍌', '🍕', '🍩', '🥕', '🍇'];
+
+        let score = 0;
+        let missedCount = 0;
+        let gameInterval;
+        let fallInterval;
+        let isGameRunning = false;
+        
+        // Variáveis de velocidade
+        let FALL_SPEED; // Será inicializada em startGame1
+        const INITIAL_FALL_SPEED = 2; // Velocidade base
+        const SPEED_INCREMENT = 1.5; // Aumento da velocidade
+        const THRESHOLD = 3; // Aumenta a cada 3 itens pegos
+
+        function createFood() {
+            if (!isGameRunning) return;
+
+            const food = document.createElement('div');
+            food.classList.add('food-item');
+            
+            const symbol = foodSymbols[Math.floor(Math.random() * foodSymbols.length)];
+            food.textContent = symbol;
+            
+            const containerWidth = container.clientWidth;
+            const foodWidth = 50;
+            const randomX = Math.floor(Math.random() * (containerWidth - foodWidth));
+            
+            food.style.left = randomX + 'px';
+            food.style.top = '0px';
+
+            food.addEventListener('click', () => catchFood(food));
+            container.appendChild(food);
+            return food;
+        }
+
+        function catchFood(foodElement) {
+            if (!isGameRunning) return;
+
+            // Lógica de Aumento de Velocidade
+            const shouldSpeedUp = (score + 1) % THRESHOLD === 0;
+            
+            score++;
+            scoreEl.textContent = score;
+            foodElement.remove();
+
+            if (shouldSpeedUp) {
+                FALL_SPEED += SPEED_INCREMENT;
+                const speedLevel = Math.floor(score / THRESHOLD) + 1;
+                speedLevelEl.textContent = speedLevel;
+                
+                messageEl.className = 'speed-up';
+                messageEl.textContent = `VELOCIDADE AUMENTADA! Nível ${speedLevel}!`;
+                
+                setTimeout(() => {
+                    messageEl.className = '';
+                    messageEl.textContent = `Pego! ${foodElement.textContent} (+1)`;
+                }, 1000);
+
+            } else {
+                messageEl.className = '';
+                messageEl.textContent = `Pego! ${foodElement.textContent} (+1)`;
+            }
+        }
+
+        function updateGame() {
+            if (!isGameRunning) {
+                clearInterval(gameInterval);
+                return;
+            }
+
+            // Move todos os alimentos que estão caindo
+            document.querySelectorAll('.food-item').forEach(food => {
+                let currentTop = parseInt(food.style.top);
+                // Usa a variável FALL_SPEED atualizada para a queda
+                let newTop = currentTop + FALL_SPEED;
+                
+                food.style.top = newTop + 'px';
+
+                // Checagem se o alimento caiu no chão
+                if (newTop > container.clientHeight) {
+                    food.remove();
+                    missedCount++;
+                    missedEl.textContent = missedCount;
+                    messageEl.textContent = `Oh não! Você perdeu um! (${food.textContent})`;
+
+                    if (missedCount >= 10) {
+                        endGame1();
+                    }
+                }
+            });
+        }
+
+        function startGame1() {
+            if (isGameRunning) return;
+            
+            // Define a velocidade inicial
+            FALL_SPEED = INITIAL_FALL_SPEED; 
+
+            container.innerHTML = '';
+            score = 0;
+            missedCount = 0;
+            scoreEl.textContent = score;
+            missedEl.textContent = missedCount;
+            speedLevelEl.textContent = 1;
+
+            isGameRunning = true;
+            messageEl.textContent = 'Pegue 30 alimentos para vencer!';
+
+            // Inicia o loop principal do jogo (queda)
+            const GAME_FRAME_RATE = 20; 
+            gameInterval = setInterval(updateGame, 1000 / GAME_FRAME_RATE); 
+            
+            // Cria um novo alimento a cada 1.5 segundos
+            fallInterval = setInterval(createFood, 1500); 
+
+            alert('Jogo iniciado! Pegue 30 alimentos para vencer. A velocidade aumenta a cada 3 pegos!');
+        }
+
+        function endGame1() {
+            clearInterval(gameInterval);
+            clearInterval(fallInterval);
+            isGameRunning = false;
+            
+            let finalMessage = (score >= 30) 
+                ? `PARABÉNS! Você VENCEU e pegou ${score} alimentos!`
+                : `FIM DE JOGO! Você perdeu 10 alimentos. Pontuação final: ${score}.`;
+            
+            alert(finalMessage);
+            messageEl.textContent = finalMessage;
+        }
+    </script>
+</body>
+</html>

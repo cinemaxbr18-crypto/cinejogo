@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mestre da Sequência</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; padding: 0; margin: 0; }
+        #sequence-game {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background: #333; /* Fundo escuro para realçar o brilho */
+            padding: 10px;
+        }
+        .color-pad {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s, box-shadow 0.2s;
+            border: 2px solid #555;
+        }
+        .color-pad:hover { opacity: 1.0; }
+        #red { background-color: red; }
+        #green { background-color: green; }
+        #blue { background-color: #00b0ff; /* Azul mais claro */ }
+        #yellow { background-color: gold; }
+        .active { 
+            opacity: 1.0; 
+            box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8); /* Brilho mais forte */
+            border: 2px solid white;
+        }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        #game-status { font-weight: bold; color: #d32f2f; }
+    </style>
+</head>
+<body>
+    <h3>Jogo 2: Mestre da Sequência</h3>
+    <div id="sequence-game">
+        <div class="color-pad" id="red" data-color="0"></div>
+        <div class="color-pad" id="green" data-color="1"></div>
+        <div class="color-pad" id="blue" data-color="2"></div>
+        <div class="color-pad" id="yellow" data-color="3"></div>
+    </div>
+    <p>Nível: <span id="level">0</span></p>
+    <p id="game-status">Aperte Começar!</p>
+    <button id="start-button" onclick="startGame2()">Começar</button>
+
+    <script>
+        const colors = ['red', 'green', 'blue', 'yellow'];
+        const pads = document.querySelectorAll('.color-pad');
+        const levelEl = document.getElementById('level');
+        const startButton = document.getElementById('start-button');
+        const statusEl = document.getElementById('game-status');
+        let sequence = [];
+        let playerSequence = [];
+        let level = 0;
+        let isPlaying = false; // Se está esperando a jogada do usuário
+
+        pads.forEach(pad => {
+            pad.addEventListener('click', handlePlayerClick);
+        });
+
+        function lightUp(pad) {
+            pad.classList.add('active');
+            // Aumentando o tempo aceso para 500ms (antes era 300ms)
+            setTimeout(() => {
+                pad.classList.remove('active');
+            }, 500);
+        }
+
+        function playSequence() {
+            let i = 0;
+            statusEl.textContent = 'PRESTE ATENÇÃO...';
+            const interval = setInterval(() => {
+                const pad = document.getElementById(colors[sequence[i]]);
+                lightUp(pad);
+                i++;
+                if (i >= sequence.length) {
+                    clearInterval(interval);
+                    isPlaying = true; // Libera o jogador
+                    statusEl.textContent = 'SUA VEZ!';
+                }
+            }, 700); // Atraso entre os brilhos também aumentado
+        }
+
+        function nextLevel() {
+            level++;
+            levelEl.textContent = level;
+            playerSequence = [];
+            
+            const randomColor = Math.floor(Math.random() * 4);
+            sequence.push(randomColor);
+
+            startButton.disabled = true;
+            setTimeout(playSequence, 1500);
+        }
+
+        function handlePlayerClick(e) {
+            if (!isPlaying) return;
+
+            const colorIndex = parseInt(e.target.dataset.color);
+            lightUp(e.target);
+            playerSequence.push(colorIndex);
+
+            // Verifica se o clique está correto
+            if (playerSequence[playerSequence.length - 1] !== sequence[playerSequence.length - 1]) {
+                statusEl.textContent = 'ERROU! Clique em Começar.';
+                alert(`Game Over! Você chegou ao Nível ${level}.`);
+                resetGame2();
+                return;
+            }
+
+            // Se o jogador completou a sequência do nível
+            if (playerSequence.length === sequence.length) {
+                isPlaying = false;
+                statusEl.textContent = 'ACERTOU! Próximo Nível...';
+                setTimeout(nextLevel, 1500);
+            }
+        }
+
+        function startGame2() {
+            resetGame2();
+            nextLevel();
+        }
+
+        function resetGame2() {
+            sequence = [];
+            playerSequence = [];
+            level = 0;
+            levelEl.textContent = 0;
+            isPlaying = false;
+            startButton.disabled = false;
+            statusEl.textContent = 'Aperte Começar!';
+        }
+    </script>
+</body>
+</html>

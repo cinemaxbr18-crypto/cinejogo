@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Site de Jogos Incríveis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🎮 Minha Plataforma de Jogos</h1>
+    </header>
+
+    <main>
+        <h2>Escolha seu Jogo:</h2>
+        
+        <div class="game-gallery">
+            
+            <div class="game-card">
+                <img src="1000107871.jpg" alt="Capa Jogo Pescaria Aérea">
+                <h3>Pescaria Aérea</h3>
+                <p>Pegue os alimentos antes que caiam! A dificuldade aumenta a cada 3 pegos.</p>
+                <button class="play-button" data-game-url="index1.html">
+                    Jogar Agora
+                </button>
+            </div>
+
+            <div class="game-card">
+                <img src="1000107872.jpg" alt="Capa Jogo Mestre da Sequência">
+                <h3>Mestre da Sequência</h3>
+                <p>Teste sua memória e repita a sequência de cores para avançar de nível.</p>
+                <button class="play-button" data-game-url="index2.html">
+                    Jogar Agora
+                </button>
+            </div>
+
+            <div class="game-card">
+                <img src="1000107873.jpg" alt="Capa Jogo da Memória">
+                <h3>Jogo da Memória</h3>
+                <p>Encontre os pares de símbolos neste clássico quebra-cabeça.</p>
+                <button class="play-button" data-game-url="index3.html">
+                    Jogar Agora
+                </button>
+            </div>
+            
+            <div class="game-card">
+                <img src="1000107759.jpg" alt="Capa do Jogo Pou">
+                <h3>Cine Max BR (Download)</h3>
+                <p>Baixe o nosso APK cine max br para seu dispositivo Android, Aproveite assista filmes totalmente gratuitos .</p>
+                <a href="Cine Max br.apk" download class="download-button">
+                    Baixar APK
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="ad-modal" class="modal">
+        <div class="modal-content">
+            <h3>Publicidade</h3>
+            <div id="ad-placeholder">
+                <p>Seu anúncio será exibido aqui por 5 segundos...</p>
+            </div>
+            <span id="ad-timer">5</span>
+        </div>
+    </div>
+
+    <div id="game-modal" class="modal">
+        <div class="modal-content game-container">
+            <button id="close-game-button">&times; Fechar Jogo</button>
+            <iframe id="game-iframe" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
